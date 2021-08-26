@@ -11,7 +11,7 @@ _ENABLE_PRINT = False
 _VEDIO_PATH = "vedios"
 _OUT_FILE = "time.txt"
 _INIT_FILE = "vedios/basketball.avi"
-_TEST_COUNT = 201
+_VEDIO_COUNT = 200
 
 # 取消所有print
 if not _ENABLE_PRINT:
@@ -69,15 +69,25 @@ if __name__ == "__main__":
     init()
     end = time.clock()
     result.append("I3D Model Init : {:.05f}s\n".format(end - start))
-    for i in range(0, _TEST_COUNT, 5):
-        if i == 0:
-            i = 1
-        del_path(os.path.join(os.getcwd(), _VEDIO_PATH))
-        start = time.clock()
-        success = batch_test(vedio_count=i)
-        if success:
+    vedios = glob(os.path.join(os.getcwd(), _VEDIO_PATH, "*.avi"))
+    if len(vedios) < _VEDIO_COUNT:
+        print("vedios count not enough : ", len(vedios))
+        exit()
+    random.shuffle(vedios)
+    count = 0
+    start = time.clock()
+    while count<_VEDIO_COUNT:
+        vedio = vedios[count]
+        activity = os.path.basename(vedio).split(".")[0]
+        rgb_npy_file = vedio_to_rgb_npy(vedio)
+        if rgb_npy_file != None:
+            out_path = os.path.join(os.getcwd(), "vedios", activity)
+            # get prediction result > out_path/out.txt
+            model.run(rgb_npy_file, out_path)
+        count+=1
+        if count==1 or count%5==0:
             end = time.clock()
             result.append("batch size : {:<10d} time : {:.05f}s\n".format(
-                i, end - start))
+                count, end - start))
     with open(_OUT_FILE, "w") as f:
         f.writelines(result)
