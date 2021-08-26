@@ -11,6 +11,7 @@ _ENABLE_PRINT = False
 _VEDIO_PATH = "vedios"
 _OUT_FILE = "time.txt"
 _INIT_FILE = "vedios/basketball.avi"
+_TEST_COUNT = 201
 
 # 取消所有print
 if not _ENABLE_PRINT:
@@ -68,7 +69,7 @@ if __name__ == "__main__":
     init()
     end = time.clock()
     result.append("I3D Model Init : {:.05f}s\n".format(end - start))
-    for i in range(0, 16, 5):
+    for i in range(0, _TEST_COUNT, 5):
         if i == 0:
             i = 1
         del_path(os.path.join(os.getcwd(), _VEDIO_PATH))
