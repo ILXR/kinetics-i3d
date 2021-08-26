@@ -2,4 +2,6 @@
 .DS_Store
 .vscode
 vedios/*
+!vedios/basketball.avi
 __pycache__
+time.txt

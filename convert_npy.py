@@ -134,7 +134,7 @@ def vedio_to_rgb_npy(file_path, max_frame_count=RGB_64_FRAMES, nchannel=3):
     print("Processing ", file_path, " to rgb64...")
     if not os.path.exists(file_path):
         print("File not exists\nDone\n")
-        return ""
+        return None
     activity = os.path.basename(file_path).split(".")[0]
     base_path = os.path.join(os.path.dirname(file_path))
     create_path(os.path.join(base_path, activity))
@@ -157,7 +157,7 @@ def vedio_to_rgb_npy(file_path, max_frame_count=RGB_64_FRAMES, nchannel=3):
             continue
     if count != RGB_64_FRAMES:
         print("Frames count incorrect : ", count)
-        return ""
+        return None
     npy_file = np.reshape(np.asarray(npy_file), (1, count, 224, 224, nchannel))
     file_path = os.path.join(base_path, activity,
                              'data_input_rgb_{}.npy'.format(activity))
@@ -169,7 +169,7 @@ def generate_rgb64_data(file_path):
     print("Processing ", file_path, " to rgb64...")
     if not os.path.exists(file_path):
         print("File not exists\nDone\n")
-        return 0, ""
+        return 0, None
     activity = os.path.basename(file_path).split(".")[0]
     frame_path = os.path.join(base_path, activity, '{}_rgb'.format(activity))
     create_path(frame_path)
@@ -187,7 +187,7 @@ def generate_data(file_path):
     print("Processing ", file_path, "...")
     if not os.path.exists(file_path):
         print("File not exists\nDone")
-        return 0, "", ""
+        return 0, None, None
     activity = os.path.basename(file_path).split(".")[0]
     frame_path = os.path.join(base_path, activity, '{}_rgb'.format(activity))
     flow_path = os.path.join(base_path, activity, '{}_flow'.format(activity),
