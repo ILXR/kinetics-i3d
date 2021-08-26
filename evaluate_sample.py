@@ -25,10 +25,12 @@ import i3d
 
 _IMAGE_SIZE = 224
 
-_SAMPLE_VIDEO_FRAMES = 79
+_SAMPLE_VIDEO_FRAMES = 101
 _SAMPLE_PATHS = {
-    'rgb': 'data/v_CricketShot_g04_c01_rgb.npy',
-    'flow': 'data/v_CricketShot_g04_c01_flow.npy',
+    # 'rgb': 'data/v_CricketShot_g04_c01_rgb.npy',
+    # 'flow': 'data/v_CricketShot_g04_c01_flow.npy',
+    'rgb': 'data_input_rgb_basketball.npy',
+    'flow': 'data_input_flow_basketball.npy',
 }
 
 _CHECKPOINT_PATHS = {
@@ -57,7 +59,7 @@ def main(unused_argv):
   NUM_CLASSES = 400
   if eval_type == 'rgb600':
     NUM_CLASSES = 600
-
+  
   if eval_type not in ['rgb', 'rgb600', 'flow', 'joint']:
     raise ValueError('Bad `eval_type`, must be one of rgb, rgb600, flow, joint')
 
