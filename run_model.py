@@ -74,7 +74,7 @@ class I3D_RGB():
                 ])
 
 
-def judge_vedio(frame_count,
+def judge_video(frame_count,
                 rgb_file,
                 flow_file,
                 imagenet_pretrained=True,

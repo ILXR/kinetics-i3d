@@ -1,7 +1,7 @@
 *.pyc
 .DS_Store
 .vscode
-vedios/*
-!vedios/basketball.avi
+videos/*
+!videos/basketball.avi
 __pycache__
 time.txt

@@ -10,7 +10,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 RGB_64_FRAMES = 64
 MAX_INT = sys.maxsize
-base_path = os.path.join(os.getcwd(), 'vedios')
+base_path = os.path.join(os.getcwd(), 'videos')
 
 
 def create_path(path):
@@ -129,7 +129,7 @@ def norm_flow(rgb_path, npy_flow, nchannel, activity):
     return npy_file, file_path
 
 
-def vedio_to_rgb_npy(file_path,
+def video_to_rgb_npy(file_path,
                      max_frame_count=RGB_64_FRAMES,
                      nchannel=3,
                      save_file=True):

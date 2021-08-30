@@ -10,10 +10,10 @@ from glob import glob
 
 _BAR = progressbar.ProgressBar()
 _ENABLE_PRINT = True
-_VEDIO_PATH = "vedios"
+_video_PATH = "videos"
 _OUT_FILE = "time.txt"
-_INIT_FILE = "vedios/basketball.avi"
-_VEDIO_COUNT = 1000
+_INIT_FILE = "videos/basketball.avi"
+_video_COUNT = 1000
 _DIVID_COUNT = 50
 
 # 取消所有print
@@ -42,7 +42,7 @@ def init():
     global model
     model = I3D_RGB()
     init_file = _INIT_FILE
-    success, rgb_npy_file = vedio_to_rgb_npy(init_file, save_file=False)
+    success, rgb_npy_file = video_to_rgb_npy(init_file, save_file=False)
     model.run(rgb_npy_file)
 
 
@@ -52,19 +52,19 @@ if __name__ == "__main__":
     init()
     end = time.clock()
     result.append("I3D Model Init : {:.05f}s\n".format(end - start))
-    vedios = glob(os.path.join(os.getcwd(), _VEDIO_PATH, "*.avi"))
-    if len(vedios) < _VEDIO_COUNT:
-        print("vedios count not enough : ", len(vedios))
+    videos = glob(os.path.join(os.getcwd(), _video_PATH, "*.avi"))
+    if len(videos) < _video_COUNT:
+        print("videos count not enough : ", len(videos))
         exit()
-    random.shuffle(vedios)
-    all_time, count, index, length = 0.0, 0, 0, len(vedios)
+    random.shuffle(videos)
+    all_time, count, index, length = 0.0, 0, 0, len(videos)
     print("Start run batch test")
     _BAR.start()
-    while count < _VEDIO_COUNT and index < length:
-        _BAR.update(count * 100 / _VEDIO_COUNT)
-        vedio = vedios[index]
-        activity = os.path.basename(vedio).split(".")[0]
-        success, rgb_npy_file = vedio_to_rgb_npy(vedio, save_file=False)
+    while count < _video_COUNT and index < length:
+        _BAR.update(count * 100 / _video_COUNT)
+        video = videos[index]
+        activity = os.path.basename(video).split(".")[0]
+        success, rgb_npy_file = video_to_rgb_npy(video, save_file=False)
         if not success:
             index += 1
             continue
