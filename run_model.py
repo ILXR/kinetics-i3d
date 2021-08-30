@@ -52,19 +52,13 @@ class I3D_RGB():
         print("init finished\n")
 
     def run(self, rgb_npy_file, out_path=None):
-        if not os.path.exists(rgb_npy_file):
-            print("npy file not exists : ", rgb_npy_file)
-            return
-        print("predicting file : ", rgb_npy_file)
         feed_dict = {}
-        rgb_sample = np.load(rgb_npy_file)
-        feed_dict[self.rgb_input] = rgb_sample
+        feed_dict[self.rgb_input] = rgb_npy_file
         out_logits, out_predictions = self.sess.run(
             [self.rgb_logits, self.model_predictions], feed_dict=feed_dict)
         out_logits = out_logits[0]
         out_predictions = out_predictions[0]
         sorted_indices = np.argsort(out_predictions)[::-1]
-
         if out_path != None:
             if not os.path.exists(out_path):
                 os.makedirs(out_path)
@@ -78,13 +72,6 @@ class I3D_RGB():
                                                   self.kinetics_classes[index])
                     for index in sorted_indices
                 ])
-        else:
-            print('Norm of logits: %f\nTop classes and probabilities' %
-                  np.linalg.norm(out_logits))
-            for index in sorted_indices[:20]:
-                print(out_predictions[index], out_logits[index],
-                      self.kinetics_classes[index])
-        print("end\n")
 
 
 def judge_vedio(frame_count,

@@ -2,16 +2,19 @@ import os
 import sys
 import time
 import random
+import progressbar
 
 from convert_npy import *
 from run_model import *
 from glob import glob
 
-_ENABLE_PRINT = False
+_BAR = progressbar.ProgressBar()
+_ENABLE_PRINT = True
 _VEDIO_PATH = "vedios"
 _OUT_FILE = "time.txt"
 _INIT_FILE = "vedios/basketball.avi"
-_VEDIO_COUNT = 200
+_VEDIO_COUNT = 1000
+_DIVID_COUNT = 50
 
 # 取消所有print
 if not _ENABLE_PRINT:
@@ -20,6 +23,7 @@ if not _ENABLE_PRINT:
 
 # 只输出error
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 # init rgb_only_64_frames i3d model
 model = None
@@ -34,33 +38,12 @@ def del_path(filepath):
             shutil.rmtree(file_path)
 
 
-def batch_test(vedio_count, vedio_path=_VEDIO_PATH):
-    # get vedio file path
-    vedios = glob(os.path.join(os.getcwd(), vedio_path, "*.avi"))
-    if len(vedios) < vedio_count:
-        print("vedios count not enough : ", len(vedios))
-        return False
-    random.shuffle(vedios)
-    for file_path in vedios:
-        if vedio_count == 0:
-            break
-        activity = os.path.basename(file_path).split(".")[0]
-        # convert vedio file to rgb_64_frame npy file
-        rgb_npy_file = vedio_to_rgb_npy(file_path)
-        if rgb_npy_file != None:
-            out_path = os.path.join(os.getcwd(), "vedios", activity)
-            # get prediction result > out_path/out.txt
-            model.run(rgb_npy_file, out_path)
-        vedio_count -= 1
-    return True
-
-
 def init():
     global model
     model = I3D_RGB()
     init_file = _INIT_FILE
-    init_npy_file = generate_rgb64_data(init_file)
-    model.run(init_npy_file)
+    success, rgb_npy_file = vedio_to_rgb_npy(init_file, save_file=False)
+    model.run(rgb_npy_file)
 
 
 if __name__ == "__main__":
@@ -74,20 +57,27 @@ if __name__ == "__main__":
         print("vedios count not enough : ", len(vedios))
         exit()
     random.shuffle(vedios)
-    count = 0
-    start = time.clock()
-    while count<_VEDIO_COUNT:
-        vedio = vedios[count]
+    all_time, count, index, length = 0.0, 0, 0, len(vedios)
+    print("Start run batch test")
+    _BAR.start()
+    while count < _VEDIO_COUNT and index < length:
+        _BAR.update(count * 100 / _VEDIO_COUNT)
+        vedio = vedios[index]
         activity = os.path.basename(vedio).split(".")[0]
-        rgb_npy_file = vedio_to_rgb_npy(vedio)
-        if rgb_npy_file != None:
-            out_path = os.path.join(os.getcwd(), "vedios", activity)
-            # get prediction result > out_path/out.txt
-            model.run(rgb_npy_file, out_path)
-        count+=1
-        if count==1 or count%5==0:
-            end = time.clock()
+        success, rgb_npy_file = vedio_to_rgb_npy(vedio, save_file=False)
+        if not success:
+            index += 1
+            continue
+        start = time.clock()
+        model.run(rgb_npy_file)
+        end = time.clock()
+        all_time += end - start
+        count += 1
+        index += 1
+        if count % _DIVID_COUNT == 0 and count > 0 and success:
             result.append("batch size : {:<10d} time : {:.05f}s\n".format(
-                count, end - start))
+                count, all_time))
+    _BAR.finish()
+    print("See result in {}".format(_OUT_FILE))
     with open(_OUT_FILE, "w") as f:
         f.writelines(result)

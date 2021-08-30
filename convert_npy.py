@@ -41,7 +41,6 @@ def vid_to_image(base_path, file, frame_path, max_frame_count=MAX_INT):
         success, image = vidcap.read()
         count += 1
         frame_no += 1
-    print("Frames count : ", count)
     return count
 
 
@@ -130,19 +129,19 @@ def norm_flow(rgb_path, npy_flow, nchannel, activity):
     return npy_file, file_path
 
 
-def vedio_to_rgb_npy(file_path, max_frame_count=RGB_64_FRAMES, nchannel=3):
-    print("Processing ", file_path, " to rgb64...")
+def vedio_to_rgb_npy(file_path,
+                     max_frame_count=RGB_64_FRAMES,
+                     nchannel=3,
+                     save_file=True):
     if not os.path.exists(file_path):
-        print("File not exists\nDone\n")
-        return None
+        print(file_path, "\nFile not exists\nDone\n")
+        return False, None
     activity = os.path.basename(file_path).split(".")[0]
     base_path = os.path.join(os.path.dirname(file_path))
-    create_path(os.path.join(base_path, activity))
     vidcap = cv2.VideoCapture(file_path)
     npy_file = []
     success, image = vidcap.read()
-    count = 0
-    frame_no = 0
+    count, frame_no = 0, 0
     while success and count < max_frame_count:
         try:
             img_new = (cv2.resize(image, (224, 224))).astype(float)
@@ -156,19 +155,20 @@ def vedio_to_rgb_npy(file_path, max_frame_count=RGB_64_FRAMES, nchannel=3):
         except:
             continue
     if count != RGB_64_FRAMES:
-        print("Frames count incorrect : ", count)
-        return None
+        print(file_path, "\nFrames count incorrect : ", count)
+        return False, None
     npy_file = np.reshape(np.asarray(npy_file), (1, count, 224, 224, nchannel))
-    file_path = os.path.join(base_path, activity,
-                             'data_input_rgb_{}.npy'.format(activity))
-    np.save(file_path, npy_file)
-    return file_path
+    if save_file:
+        create_path(os.path.join(base_path, activity))
+        file_path = os.path.join(base_path, activity,
+                                 'data_input_rgb_{}.npy'.format(activity))
+        np.save(file_path, npy_file)
+    return True, npy_file
 
 
 def generate_rgb64_data(file_path):
-    print("Processing ", file_path, " to rgb64...")
     if not os.path.exists(file_path):
-        print("File not exists\nDone\n")
+        print(file_path, "\nFile not exists\nDone\n")
         return 0, None
     activity = os.path.basename(file_path).split(".")[0]
     frame_path = os.path.join(base_path, activity, '{}_rgb'.format(activity))
@@ -176,10 +176,9 @@ def generate_rgb64_data(file_path):
     #Convert your video to frames and save in to activity_rgb folder
     frame_count = vid_to_image(base_path, file_path, frame_path, RGB_64_FRAMES)
     if frame_count != 64:
-        print("frames count incorrect : ", frame_count)
+        print(file_path, "\nframes count incorrect : ", frame_count)
     #generate npy files
     rgb_file, rgb_path = norm_rgb(frame_path, frame_path, 3, activity)
-    print("Done\n")
     return rgb_path
 
 
